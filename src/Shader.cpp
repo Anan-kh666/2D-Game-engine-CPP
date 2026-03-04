@@ -1,5 +1,6 @@
 #include "Shader.h"
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 Shader::Shader(const std::string& vertexSrc, const std::string& fragmentSrc) {
 
@@ -52,4 +53,14 @@ void Shader::Bind() const {
 
 void Shader::Unbind() const {
     glUseProgram(0);
+}
+
+void Shader::SetUniform1i(const std::string& name, int value) {
+    int location = glGetUniformLocation(m_RendererID, name.c_str());
+    glUniform1i(location, value);
+}
+
+void Shader::SetUniformMat4(const std::string& name, const glm::mat4& matrix) {
+    int location = glGetUniformLocation(m_RendererID, name.c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
