@@ -1,0 +1,9 @@
+# Ignore the CMake build directory
+build/
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore IDE specific folders (if you use VSCode, CLion, etc.)
+.vscode/
+.idea/
