@@ -9,9 +9,9 @@ static const uint32_t MaxIndices = MaxQuads * 6;
 
 struct QuadVertex {
     glm::vec3 Position;
-    glm::vec4 Color;
-    glm::vec2 TexCoord;
     float TexIndex;
+    float R, G, B, A;
+    glm::vec2 TexCoord;
 };
 
 struct Renderer2DData {
@@ -128,27 +128,39 @@ void Renderer2D::EndScene() {
 
 void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color) {
     s_Data->QuadVertexBufferPtr->Position = { position.x, position.y, 0.0f };
-    s_Data->QuadVertexBufferPtr->Color = color;
-    s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
     s_Data->QuadVertexBufferPtr->TexIndex = 0.0f;
+    s_Data->QuadVertexBufferPtr->R = color.r;
+    s_Data->QuadVertexBufferPtr->G = color.g;
+    s_Data->QuadVertexBufferPtr->B = color.b;
+    s_Data->QuadVertexBufferPtr->A = color.a;
+    s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
     s_Data->QuadVertexBufferPtr++;
 
     s_Data->QuadVertexBufferPtr->Position = { position.x + size.x, position.y, 0.0f };
-    s_Data->QuadVertexBufferPtr->Color = color;
-    s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
     s_Data->QuadVertexBufferPtr->TexIndex = 0.0f;
+    s_Data->QuadVertexBufferPtr->R = color.r;
+    s_Data->QuadVertexBufferPtr->G = color.g;
+    s_Data->QuadVertexBufferPtr->B = color.b;
+    s_Data->QuadVertexBufferPtr->A = color.a;
+    s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
     s_Data->QuadVertexBufferPtr++;
 
     s_Data->QuadVertexBufferPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
-    s_Data->QuadVertexBufferPtr->Color = color;
-    s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
     s_Data->QuadVertexBufferPtr->TexIndex = 0.0f;
+    s_Data->QuadVertexBufferPtr->R = color.r;
+    s_Data->QuadVertexBufferPtr->G = color.g;
+    s_Data->QuadVertexBufferPtr->B = color.b;
+    s_Data->QuadVertexBufferPtr->A = color.a;
+    s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
     s_Data->QuadVertexBufferPtr++;
 
     s_Data->QuadVertexBufferPtr->Position = { position.x, position.y + size.y, 0.0f };
-    s_Data->QuadVertexBufferPtr->Color = color;
-    s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
     s_Data->QuadVertexBufferPtr->TexIndex = 0.0f;
+    s_Data->QuadVertexBufferPtr->R = color.r;
+    s_Data->QuadVertexBufferPtr->G = color.g;
+    s_Data->QuadVertexBufferPtr->B = color.b;
+    s_Data->QuadVertexBufferPtr->A = color.a;
+    s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
     s_Data->QuadVertexBufferPtr++;
 
     s_Data->QuadIndexCount += 6;
@@ -157,30 +169,41 @@ void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, cons
 
 void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Texture2D& texture) {
     texture.Bind(0);
-    constexpr glm::vec4 whiteColor = {1.0f, 1.0f, 1.0f, 1.0f};
 
     s_Data->QuadVertexBufferPtr->Position = { position.x, position.y, 0.0f };
-    s_Data->QuadVertexBufferPtr->Color = whiteColor;
-    s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
     s_Data->QuadVertexBufferPtr->TexIndex = 1.0f;
+    s_Data->QuadVertexBufferPtr->R = 1.0f;
+    s_Data->QuadVertexBufferPtr->G = 1.0f;
+    s_Data->QuadVertexBufferPtr->B = 1.0f;
+    s_Data->QuadVertexBufferPtr->A = 1.0f;
+    s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0f };
     s_Data->QuadVertexBufferPtr++;
 
     s_Data->QuadVertexBufferPtr->Position = { position.x + size.x, position.y, 0.0f };
-    s_Data->QuadVertexBufferPtr->Color = whiteColor;
-    s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
     s_Data->QuadVertexBufferPtr->TexIndex = 1.0f;
+    s_Data->QuadVertexBufferPtr->R = 1.0f;
+    s_Data->QuadVertexBufferPtr->G = 1.0f;
+    s_Data->QuadVertexBufferPtr->B = 1.0f;
+    s_Data->QuadVertexBufferPtr->A = 1.0f;
+    s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 0.0f };
     s_Data->QuadVertexBufferPtr++;
 
     s_Data->QuadVertexBufferPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
-    s_Data->QuadVertexBufferPtr->Color = whiteColor;
-    s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
     s_Data->QuadVertexBufferPtr->TexIndex = 1.0f;
+    s_Data->QuadVertexBufferPtr->R = 1.0f;
+    s_Data->QuadVertexBufferPtr->G = 1.0f;
+    s_Data->QuadVertexBufferPtr->B = 1.0f;
+    s_Data->QuadVertexBufferPtr->A = 1.0f;
+    s_Data->QuadVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
     s_Data->QuadVertexBufferPtr++;
 
     s_Data->QuadVertexBufferPtr->Position = { position.x, position.y + size.y, 0.0f };
-    s_Data->QuadVertexBufferPtr->Color = whiteColor;
-    s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
     s_Data->QuadVertexBufferPtr->TexIndex = 1.0f;
+    s_Data->QuadVertexBufferPtr->R = 1.0f;
+    s_Data->QuadVertexBufferPtr->G = 1.0f;
+    s_Data->QuadVertexBufferPtr->B = 1.0f;
+    s_Data->QuadVertexBufferPtr->A = 1.0f;
+    s_Data->QuadVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
     s_Data->QuadVertexBufferPtr++;
 
     s_Data->QuadIndexCount += 6;

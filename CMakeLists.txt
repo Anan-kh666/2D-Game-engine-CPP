@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
+
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -24,7 +25,7 @@ FetchContent_MakeAvailable(glm)
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG docking 
+    GIT_TAG docking
 )
 FetchContent_MakeAvailable(imgui)
 
@@ -35,29 +36,40 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(entt)
 
+FetchContent_Declare(
+    box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d.git
+    GIT_TAG v2.4.1
+)
+set(BOX2D_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(box2d)
+
 include_directories(
-    include 
-    vendor/glad/include 
-    vendor/stb_image 
+    include
+    vendor/glad/include
+    vendor/stb_image
     ${glm_SOURCE_DIR}
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
     ${entt_SOURCE_DIR}/src
+    ${box2d_SOURCE_DIR}/include
 )
 
-add_executable(2DEngine 
-    src/main.cpp 
-    src/Application.cpp 
-    src/Input.cpp 
-    src/Shader.cpp 
-    src/Buffer.cpp 
-    src/VertexArray.cpp 
+add_executable(2DEngine
+    src/main.cpp
+    src/Application.cpp
+    src/Input.cpp
+    src/Shader.cpp
+    src/Buffer.cpp
+    src/VertexArray.cpp
     src/Texture2D.cpp
     src/ImGuiLayer.cpp
     src/OrthographicCamera.cpp
     src/Renderer2D.cpp
     src/Scene.cpp
-    vendor/glad/src/glad.c 
+    vendor/glad/src/glad.c
     vendor/stb_image/stb_image.cpp
     ${imgui_SOURCE_DIR}/imgui.cpp
     ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -67,7 +79,7 @@ add_executable(2DEngine
     ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
-target_link_libraries(2DEngine PRIVATE glfw)
+target_link_libraries(2DEngine PRIVATE glfw box2d)
 if (APPLE)
     target_link_libraries(2DEngine PRIVATE "-framework OpenGL" "-framework Cocoa" "-framework IOKit" "-framework CoreVideo")
 endif()
