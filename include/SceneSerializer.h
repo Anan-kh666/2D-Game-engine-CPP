@@ -1,0 +1,13 @@
+#pragma once
+#include "Scene.h"
+#include <string>
+
+class SceneSerializer {
+public:
+    SceneSerializer(Scene* scene);
+
+    void Serialize(const std::string& filepath);
+
+private:
+    Scene* m_Scene;
+};

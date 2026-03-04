@@ -5,6 +5,7 @@
 #include "ImGuiLayer.h"
 #include "Scene.h"
 #include "Components.h"
+#include "SceneSerializer.h"
 #include "Texture2D.h"
 #include <imgui.h>
 #include <iostream>
@@ -18,6 +19,7 @@ Texture2D* playerTexture;
 
 glm::vec3 cameraPos = {0.0f, 0.0f, 0.0f};
 float cameraSpeed = 5.0f;
+bool isPlaying = false;
 
 Application::Application() {
     s_Instance = this;
@@ -28,7 +30,7 @@ Application::Application() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    m_Window = glfwCreateWindow(800, 600, "2D Engine - Box2D Physics!", NULL, NULL);
+    m_Window = glfwCreateWindow(800, 600, "2D Engine - Play/Stop Mode!", NULL, NULL);
     glfwMakeContextCurrent(m_Window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
@@ -70,8 +72,6 @@ Application::Application() {
 
     activeScene->GetRegistry().emplace<Rigidbody2DComponent>(floorEntity);
     activeScene->GetRegistry().emplace<BoxCollider2DComponent>(floorEntity);
-
-    activeScene->StartPhysics();
 }
 
 Application::~Application() {
@@ -103,6 +103,26 @@ void Application::Run() {
         activeScene->OnUpdate(*camera, timestep);
 
         imGuiLayer->Begin();
+
+        ImGui::Begin("Toolbar");
+        if (!isPlaying) {
+            if (ImGui::Button("Play", ImVec2(100, 30))) {
+                activeScene->StartPhysics();
+                isPlaying = true;
+            }
+        } else {
+            if (ImGui::Button("Stop", ImVec2(100, 30))) {
+                activeScene->StopPhysics();
+                isPlaying = false;
+            }
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Save Scene", ImVec2(100, 30))) {
+            SceneSerializer serializer(activeScene);
+            serializer.Serialize("Level_1.json");
+        }
+        ImGui::End();
+
         ImGui::Begin("Renderer Data");
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
@@ -111,6 +131,7 @@ void Application::Run() {
         ImGui::Separator();
         ImGui::Text("Framerate: %.1f FPS", ImGui::GetIO().Framerate);
         ImGui::End();
+
         imGuiLayer->End();
 
         glfwSwapBuffers(m_Window);

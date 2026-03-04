@@ -46,6 +46,13 @@ set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
 set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(box2d)
 
+FetchContent_Declare(
+    json 
+    GIT_REPOSITORY https://github.com/nlohmann/json.git 
+    GIT_TAG v3.11.3
+)
+FetchContent_MakeAvailable(json)
+
 include_directories(
     include
     vendor/glad/include
@@ -55,6 +62,7 @@ include_directories(
     ${imgui_SOURCE_DIR}/backends
     ${entt_SOURCE_DIR}/src
     ${box2d_SOURCE_DIR}/include
+    ${json_SOURCE_DIR}/include
 )
 
 add_executable(2DEngine
@@ -69,6 +77,7 @@ add_executable(2DEngine
     src/OrthographicCamera.cpp
     src/Renderer2D.cpp
     src/Scene.cpp
+    src/SceneSerializer.cpp
     vendor/glad/src/glad.c
     vendor/stb_image/stb_image.cpp
     ${imgui_SOURCE_DIR}/imgui.cpp
