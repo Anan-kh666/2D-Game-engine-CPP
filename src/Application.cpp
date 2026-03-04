@@ -3,12 +3,15 @@
 #include "Renderer2D.h"
 #include "OrthographicCamera.h"
 #include "ImGuiLayer.h"
+#include "Scene.h"
+#include "Components.h"
 #include <imgui.h>
 #include <iostream>
 
 Application* Application::s_Instance = nullptr;
 OrthographicCamera* camera;
 ImGuiLayer* imGuiLayer;
+Scene* activeScene;
 glm::vec3 cameraPos = {0.0f, 0.0f, 0.0f};
 float cameraSpeed = 5.0f;
 
@@ -19,7 +22,7 @@ Application::Application() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    m_Window = glfwCreateWindow(800, 600, "2D Engine - Batch Rendering", NULL, NULL);
+    m_Window = glfwCreateWindow(800, 600, "2D Engine - ECS Powered!", NULL, NULL);
     glfwMakeContextCurrent(m_Window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glEnable(GL_BLEND);
@@ -30,9 +33,25 @@ Application::Application() {
     camera = new OrthographicCamera(-1.33f, 1.33f, -1.0f, 1.0f);
     imGuiLayer = new ImGuiLayer();
     imGuiLayer->Init(m_Window);
+
+    activeScene = new Scene();
+
+    for (float y = -5.0f; y < 5.0f; y += 0.1f) {
+        for (float x = -5.0f; x < 5.0f; x += 0.1f) {
+            entt::entity entity = activeScene->CreateEntity();
+
+            TransformComponent& transform = activeScene->GetRegistry().emplace<TransformComponent>(entity);
+            transform.Position = { x, y, 0.0f };
+            transform.Size = { 0.09f, 0.09f };
+
+            SpriteRendererComponent& sprite = activeScene->GetRegistry().emplace<SpriteRendererComponent>(entity);
+            sprite.Color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 1.0f };
+        }
+    }
 }
 
 Application::~Application() {
+    delete activeScene;
     imGuiLayer->Shutdown();
     Renderer2D::Shutdown();
     glfwTerminate();
@@ -56,16 +75,7 @@ void Application::Run() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         Renderer2D::ResetStats();
-        Renderer2D::BeginScene(*camera);
-
-        for (float y = -5.0f; y < 5.0f; y += 0.1f) {
-            for (float x = -5.0f; x < 5.0f; x += 0.1f) {
-                glm::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 1.0f};
-                Renderer2D::DrawQuad({x, y}, {0.09f, 0.09f}, color);
-            }
-        }
-
-        Renderer2D::EndScene();
+        activeScene->OnUpdate(*camera);
 
         imGuiLayer->Begin();
 
@@ -74,8 +84,6 @@ void Application::Run() {
         ImGui::Text("Renderer2D Stats:");
         ImGui::Text("Draw Calls: %d", stats.DrawCalls);
         ImGui::Text("Quads: %d", stats.QuadCount);
-        ImGui::Text("Vertices: %d", stats.QuadCount * 4);
-        ImGui::Text("Indices: %d", stats.QuadCount * 6);
         ImGui::Separator();
         ImGui::Text("Framerate: %.1f FPS", ImGui::GetIO().Framerate);
         ImGui::End();

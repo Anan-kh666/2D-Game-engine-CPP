@@ -28,6 +28,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imgui)
 
+FetchContent_Declare(
+    entt
+    GIT_REPOSITORY https://github.com/skypjack/entt.git
+    GIT_TAG v3.12.2
+)
+FetchContent_MakeAvailable(entt)
+
 include_directories(
     include 
     vendor/glad/include 
@@ -35,6 +42,7 @@ include_directories(
     ${glm_SOURCE_DIR}
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
+    ${entt_SOURCE_DIR}/src
 )
 
 add_executable(2DEngine 
@@ -48,6 +56,7 @@ add_executable(2DEngine
     src/ImGuiLayer.cpp
     src/OrthographicCamera.cpp
     src/Renderer2D.cpp
+    src/Scene.cpp
     vendor/glad/src/glad.c 
     vendor/stb_image/stb_image.cpp
     ${imgui_SOURCE_DIR}/imgui.cpp
