@@ -33,6 +33,7 @@ add_executable(2DEngine
     src/VertexArray.cpp 
     src/Texture2D.cpp
     src/OrthographicCamera.cpp
+    src/Renderer2D.cpp
     vendor/glad/src/glad.c 
     vendor/stb_image/stb_image.cpp
 )

@@ -12,6 +12,7 @@ public:
     void Unbind() const;
     void SetUniform1i(const std::string& name, int value);
     void SetUniformMat4(const std::string& name, const glm::mat4& matrix);
+    void SetUniformVec4(const std::string& name, const glm::vec4& value);
 
 private:
     unsigned int m_RendererID;
