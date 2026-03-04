@@ -4,10 +4,20 @@
 // Vertex Buffer Implementation
 
 VertexBuffer::VertexBuffer(const float* vertices, unsigned int size) {
-
     glGenBuffers(1, &m_RendererID);
     glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
     glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+}
+
+VertexBuffer::VertexBuffer(unsigned int size) {
+    glGenBuffers(1, &m_RendererID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+    glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+}
+
+void VertexBuffer::SetData(const void* data, unsigned int size) {
+    glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 }
 
 VertexBuffer::~VertexBuffer() {
