@@ -3,6 +3,7 @@
 ![C++](https://img.shields.io/badge/C%2B%2B-17-00599C?style=flat-square&logo=cplusplus&logoColor=white)
 ![OpenGL](https://img.shields.io/badge/OpenGL-4.1-5586A4?style=flat-square&logo=opengl&logoColor=white)
 ![CMake](https://img.shields.io/badge/CMake-3.20%2B-064F8C?style=flat-square&logo=cmake&logoColor=white)
+![Build Status](https://github.com/yourusername/forge2d/actions/workflows/build.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square)
 
@@ -36,8 +37,8 @@ A professional-grade, **data-oriented 2D game engine** built from scratch in mod
 - **Scene Serialization with nlohmann/json**
   The entire ECS registry — transforms, sprites, physics bodies, and metadata — can be serialized to a human-readable `.json` file and deserialized back into a live engine session with full fidelity. No scene data is lost across save/load cycles.
 
-- **Zero-Setup Automated Build**
-  CMake's `FetchContent` module automatically downloads, configures, and statically links **all dependencies** at configure time. No `vcpkg`, no manual installs, no submodule headaches — just clone and build.
+- **Zero-Setup Automated Build & Testing**
+  CMake `FetchContent` automatically downloads, configures, and statically links all dependencies (including **GoogleTest**). The project is fully target-based, meaning building the engine or running `ctest` works out of the box. An included GitHub Actions workflow ensures the engine successfully compiles and passes all tests across macOS, Linux, and Windows on every push.
 
 ---
 
@@ -54,6 +55,7 @@ A professional-grade, **data-oriented 2D game engine** built from scratch in mod
 | **Dear ImGui** (docking branch) | Immediate-mode editor UI |
 | **nlohmann/json** | Scene serialization & deserialization |
 | **stb_image** | Single-header texture loading |
+| **GoogleTest** | Core automated unit testing |
 
 ---
 
@@ -85,8 +87,11 @@ cmake ..
 # 4. Compile
 cmake --build . --config Release
 
-# 5. Run the engine
-./Forge2D
+# 5. Run the Automated Tests (Optional)
+ctest --test-dir build -C Release
+
+# 6. Run the engine
+./build/2DEngine
 ```
 
 > On Apple Silicon (M1/M2/M3), the build targets OpenGL 4.1 Core Profile — the highest version supported on macOS. All vertex layout optimizations for ARM64 alignment are applied automatically.
