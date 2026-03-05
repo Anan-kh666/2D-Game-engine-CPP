@@ -105,23 +105,49 @@ void Application::Run() {
         imGuiLayer->Begin();
 
         ImGui::Begin("Toolbar");
-        if (!isPlaying) {
-            if (ImGui::Button("Play", ImVec2(100, 30))) {
-                activeScene->StartPhysics();
-                isPlaying = true;
-            }
-        } else {
-            if (ImGui::Button("Stop", ImVec2(100, 30))) {
-                activeScene->StopPhysics();
-                isPlaying = false;
-            }
+
+if (!isPlaying) {
+    if (ImGui::Button("Play", ImVec2(80, 30))) {
+        activeScene->StartPhysics();
+        isPlaying = true;
+    }
+} else {
+    if (ImGui::Button("Stop", ImVec2(80, 30))) {
+        activeScene->StopPhysics();
+        isPlaying = false;
+    }
+}
+
+ImGui::SameLine();
+
+if (ImGui::Button("Save Scene", ImVec2(100, 30))) {
+    SceneSerializer serializer(activeScene);
+    serializer.Serialize("Level_1.json");
+}
+
+ImGui::SameLine();
+
+if (ImGui::Button("Load Scene", ImVec2(100, 30))) {
+    if (isPlaying) {
+        activeScene->StopPhysics();
+        isPlaying = false;
+    }
+
+    delete activeScene;
+    activeScene = new Scene();
+
+    SceneSerializer serializer(activeScene);
+    serializer.Deserialize("Level_1.json");
+
+    auto view = activeScene->GetRegistry().view<Rigidbody2DComponent, SpriteRendererComponent>();
+    for (auto e : view) {
+        if (activeScene->GetRegistry().get<Rigidbody2DComponent>(e).Type == Rigidbody2DType::Dynamic) {
+            activeScene->GetRegistry().get<SpriteRendererComponent>(e).Texture = playerTexture;
         }
-        ImGui::SameLine();
-        if (ImGui::Button("Save Scene", ImVec2(100, 30))) {
-            SceneSerializer serializer(activeScene);
-            serializer.Serialize("Level_1.json");
-        }
-        ImGui::End();
+    }
+}
+
+ImGui::End();
 
         ImGui::Begin("Renderer Data");
         auto stats = Renderer2D::GetStats();

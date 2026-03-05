@@ -56,3 +56,56 @@ void SceneSerializer::Serialize(const std::string& filepath) {
     file << std::setw(4) << sceneData << std::endl;
     std::cout << "Successfully saved scene to " << filepath << "!" << std::endl;
 }
+
+bool SceneSerializer::Deserialize(const std::string& filepath) {
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        std::cout << "Failed to open file: " << filepath << std::endl;
+        return false;
+    }
+    json sceneData;
+    file >> sceneData;
+    if (!sceneData.contains("Entities")) return false;
+    for (auto& entityData : sceneData["Entities"]) {
+        entt::entity entity = m_Scene->CreateEntity();
+        if (entityData.contains("TransformComponent")) {
+            auto& tc = m_Scene->GetRegistry().emplace<TransformComponent>(entity);
+            tc.Position = {
+                entityData["TransformComponent"]["Position"][0],
+                entityData["TransformComponent"]["Position"][1],
+                entityData["TransformComponent"]["Position"][2]
+            };
+            tc.Size = {
+                entityData["TransformComponent"]["Size"][0],
+                entityData["TransformComponent"]["Size"][1]
+            };
+        }
+        if (entityData.contains("SpriteRendererComponent")) {
+            auto& src = m_Scene->GetRegistry().emplace<SpriteRendererComponent>(entity);
+            src.Color = {
+                entityData["SpriteRendererComponent"]["Color"][0],
+                entityData["SpriteRendererComponent"]["Color"][1],
+                entityData["SpriteRendererComponent"]["Color"][2],
+                entityData["SpriteRendererComponent"]["Color"][3]
+            };
+        }
+        if (entityData.contains("Rigidbody2DComponent")) {
+            auto& rb2d = m_Scene->GetRegistry().emplace<Rigidbody2DComponent>(entity);
+            rb2d.Type = (Rigidbody2DType)entityData["Rigidbody2DComponent"]["Type"];
+            rb2d.FixedRotation = entityData["Rigidbody2DComponent"]["FixedRotation"];
+        }
+
+        if (entityData.contains("BoxCollider2DComponent")) {
+            auto& bc2d = m_Scene->GetRegistry().emplace<BoxCollider2DComponent>(entity);
+            bc2d.Size = {
+                entityData["BoxCollider2DComponent"]["Size"][0],
+                entityData["BoxCollider2DComponent"]["Size"][1]
+            };
+            bc2d.Density = entityData["BoxCollider2DComponent"]["Density"];
+            bc2d.Friction = entityData["BoxCollider2DComponent"]["Friction"];
+            bc2d.Restitution = entityData["BoxCollider2DComponent"]["Restitution"];
+        }
+    }
+    std::cout << "Successfully loaded scene from " << filepath << "!" << std::endl;
+    return true;
+}
