@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
+# --- Dependencies ---
+
+# GLFW
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -15,6 +18,7 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw)
 
+# GLM
 FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
@@ -22,6 +26,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 
+# ImGui
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
@@ -29,6 +34,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imgui)
 
+# EnTT
 FetchContent_Declare(
     entt
     GIT_REPOSITORY https://github.com/skypjack/entt.git
@@ -36,6 +42,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(entt)
 
+# Box2D
 FetchContent_Declare(
     box2d
     GIT_REPOSITORY https://github.com/erincatto/box2d.git
@@ -46,6 +53,7 @@ set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
 set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(box2d)
 
+# JSON
 FetchContent_Declare(
     json 
     GIT_REPOSITORY https://github.com/nlohmann/json.git 
@@ -53,20 +61,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-include_directories(
-    include
-    vendor/glad/include
-    vendor/stb_image
-    ${glm_SOURCE_DIR}
-    ${imgui_SOURCE_DIR}
-    ${imgui_SOURCE_DIR}/backends
-    ${entt_SOURCE_DIR}/src
-    ${box2d_SOURCE_DIR}/include
-    ${json_SOURCE_DIR}/include
+# Google Test 
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG release-1.12.1
 )
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
-add_executable(2DEngine
-    src/main.cpp
+# --- Engine Core Library ---
+
+add_library(EngineCore
     src/Application.cpp
     src/Input.cpp
     src/Shader.cpp
@@ -88,7 +94,37 @@ add_executable(2DEngine
     ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
-target_link_libraries(2DEngine PRIVATE glfw box2d)
+target_include_directories(EngineCore PUBLIC
+    include
+    vendor/glad/include
+    vendor/stb_image
+    ${glm_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+    ${entt_SOURCE_DIR}/src
+    ${box2d_SOURCE_DIR}/include
+    ${json_SOURCE_DIR}/include
+)
+
+target_link_libraries(EngineCore PUBLIC glfw box2d)
 if (APPLE)
-    target_link_libraries(2DEngine PRIVATE "-framework OpenGL" "-framework Cocoa" "-framework IOKit" "-framework CoreVideo")
+    target_link_libraries(EngineCore PUBLIC "-framework OpenGL" "-framework Cocoa" "-framework IOKit" "-framework CoreVideo")
 endif()
+
+# Strict compiler warnings
+if(MSVC)
+  target_compile_options(EngineCore PRIVATE /W4 /WX)
+else()
+  target_compile_options(EngineCore PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  set_source_files_properties(vendor/glad/src/glad.c PROPERTIES COMPILE_FLAGS "-Wno-error")
+endif()
+
+# --- Application Executable ---
+
+add_executable(2DEngine src/main.cpp)
+target_link_libraries(2DEngine PRIVATE EngineCore)
+
+# --- Automated Testing ---
+
+enable_testing()
+add_subdirectory(tests)
