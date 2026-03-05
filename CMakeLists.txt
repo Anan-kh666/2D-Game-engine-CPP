@@ -119,10 +119,20 @@ else()
   set_source_files_properties(vendor/glad/src/glad.c PROPERTIES COMPILE_FLAGS "-Wno-error")
 endif()
 
+# --- Premium Plugins ---
+add_subdirectory(plugins)
+
 # --- Application Executable ---
 
 add_executable(2DEngine src/main.cpp)
-target_link_libraries(2DEngine PRIVATE EngineCore)
+
+# Link Core Engine + Any Premium Plugins dropped into the /plugins folder
+target_link_libraries(2DEngine PRIVATE EngineCore ${FORGE2D_PLUGINS})
+
+# Add plugin include directories so main.cpp can see their headers
+foreach(plugin ${FORGE2D_PLUGINS})
+    target_include_directories(2DEngine PRIVATE plugins/${plugin}/include)
+endforeach()
 
 # --- Automated Testing ---
 
